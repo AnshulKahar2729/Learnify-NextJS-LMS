@@ -1,6 +1,5 @@
 "use client";
-import * as z from "zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -17,17 +16,16 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-
-const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is required",
-  }),
-});
+import {
+  CourseTitlePayload,
+  CourseTitleValidator,
+} from "@/lib/validators/course";
+import { useMutation } from "@tanstack/react-query";
 
 const CreatePage = () => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CourseTitlePayload>({
+    resolver: zodResolver(CourseTitleValidator),
     defaultValues: {
       title: "",
     },
@@ -35,16 +33,47 @@ const CreatePage = () => {
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
+  const { mutate: createCourse, isPending } = useMutation({
+    mutationFn: async ({ title }: CourseTitlePayload) => {
+      const payload = {
+        title: title,
+      };
+
+      const { data } = await axios.post("/api/courses", payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      router.push(`/teacher/courses/${data.id}`);
+      toast.success("Course created successfully!");
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          return router.push("/sign-in");
+        }
+      }
+      toast.error("An error occurred. Please try again.");
+    },
+  });
+
+  const onSubmit = async (values: CourseTitlePayload) => {
+    /* try {
       console.log(values);
-      const response = await axios.post("/api/courses", values);
-      router.push(`/teacher/courses/${response.data.id}`);
+      const payload = {
+        title: values.title,
+      };
+      const { data } = await axios.post("/api/courses", payload);
+      router.push(`/teacher/courses/${data.id}`);
       toast.success("Course created successfully!");
     } catch (error) {
       console.log(error);
       toast.error("An error occurred. Please try again.");
-    }
+    } */
+    const payload: CourseTitlePayload = {
+      title: values.title,
+    };
+
+    createCourse(payload);
   };
 
   return (
@@ -83,9 +112,17 @@ const CreatePage = () => {
 
             <div className=" flex items-center gap-x-2">
               <Link href={"/"}>
-                <Button type="button" variant={"ghost"}>Cancel</Button>
+                <Button type="button" variant={"ghost"}>
+                  Cancel
+                </Button>
               </Link>
-              <Button type="submit" disabled={!isValid || isSubmitting}>Continue</Button>
+              <Button
+                type="submit"
+                disabled={isPending || !isValid}
+                isLoading={isPending}
+              >
+                Continue
+              </Button>
             </div>
           </form>
         </Form>

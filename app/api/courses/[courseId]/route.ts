@@ -1,31 +1,40 @@
 import { db } from "@/lib/db";
-import { CourseTitleValidator } from "@/lib/validators/course";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-export async function POST(req: Request) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: { courseId: string } }
+) {
   try {
     const { userId } = auth();
-
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.json();
-    const { title } = CourseTitleValidator.parse(body);
-    if (!title) {
-      return new NextResponse("Title is required", { status: 400 });
-    }
+    const { courseId } = params;
+    const values = await req.json();
 
-    const course = await db.course.create({
-      data: {
-        userId,
-        title,
+    const courseOwner = await db.course.findUnique({
+      where: {
+        id: courseId,
+        userId: userId,
       },
     });
 
-    return NextResponse.json(course);
+    if (!courseOwner) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const course = await db.course.update({
+      where: { id: courseId, userId },
+      data: {
+        ...values,
+      },
+    });
+
+    return new Response(JSON.stringify(course), { status: 200 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return new Response(error.message, { status: 422 });
