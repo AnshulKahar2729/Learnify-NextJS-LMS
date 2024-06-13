@@ -3,6 +3,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { FC } from "react";
+import { ConfettiProvider } from "./providers/confetti-provider";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -12,7 +13,7 @@ const Providers: FC<ProvidersProps> = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ClerkProvider>
-        {children}
+        <ConfettiProvider />
       </ClerkProvider>
     </QueryClientProvider>
   );

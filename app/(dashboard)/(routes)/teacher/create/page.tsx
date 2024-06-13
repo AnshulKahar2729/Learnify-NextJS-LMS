@@ -44,6 +44,7 @@ const CreatePage = () => {
     },
     onSuccess: (data) => {
       router.push(`/teacher/courses/${data.id}`);
+      router.refresh();
       toast.success("Course created successfully!");
     },
     onError: (error) => {
@@ -57,18 +58,6 @@ const CreatePage = () => {
   });
 
   const onSubmit = async (values: CourseTitlePayload) => {
-    /* try {
-      console.log(values);
-      const payload = {
-        title: values.title,
-      };
-      const { data } = await axios.post("/api/courses", payload);
-      router.push(`/teacher/courses/${data.id}`);
-      toast.success("Course created successfully!");
-    } catch (error) {
-      console.log(error);
-      toast.error("An error occurred. Please try again.");
-    } */
     const payload: CourseTitlePayload = {
       title: values.title,
     };
