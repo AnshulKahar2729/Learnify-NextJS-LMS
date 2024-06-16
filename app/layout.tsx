@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import ToasterProvider from "@/components/providers/ToasterProvider";
 import Providers from "@/components/Providers";

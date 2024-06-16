@@ -29,6 +29,7 @@ export async function DELETE(
     });
 
     if (!courseOwner) {
+      console.log("not a course owner");
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

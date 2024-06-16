@@ -14,6 +14,7 @@ const Providers: FC<ProvidersProps> = ({ children }) => {
     <QueryClientProvider client={queryClient}>
       <ClerkProvider>
         <ConfettiProvider />
+        {children}
       </ClerkProvider>
     </QueryClientProvider>
   );

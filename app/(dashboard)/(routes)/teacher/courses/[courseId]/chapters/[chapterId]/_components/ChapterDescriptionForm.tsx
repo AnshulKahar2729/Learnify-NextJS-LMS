@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chapter} from "@prisma/client";
+import { Chapter } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { Pencil } from "lucide-react";
@@ -26,7 +26,7 @@ import { z } from "zod";
 interface ChapterDescriptionFormProps {
   initialData: Chapter;
   courseId: string;
-  chapterId : string
+  chapterId: string;
 }
 
 const formSchema = z.object({
@@ -37,11 +37,10 @@ const formSchema = z.object({
 
 type formSchemaType = z.infer<typeof formSchema>;
 
-
 const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
   initialData,
   courseId,
-  chapterId
+  chapterId,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
@@ -53,7 +52,7 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
     },
   });
 
-  const {  isValid } = form.formState;
+  const { isValid } = form.formState;
 
   const { mutate: updateChapterDescription, isPending } = useMutation({
     mutationFn: async ({ description }: formSchemaType) => {
@@ -61,7 +60,10 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
         description,
       };
 
-      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, payload);
+      await axios.patch(
+        `/api/courses/${courseId}/chapters/${chapterId}`,
+        payload
+      );
       return;
     },
     onSuccess: () => {
@@ -80,8 +82,8 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
   });
 
   const onSubmit = async (values: formSchemaType) => {
-    const payload : formSchemaType = {
-      description: values.description
+    const payload: formSchemaType = {
+      description: values.description,
     };
     updateChapterDescription(payload);
   };
@@ -108,15 +110,19 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
           </Button>
         </div>
 
-        {!isEditing && <div className={cn("text-sm mt-2", !initialData.description && " text-slate-500 italic")}>
-          {!initialData.description && "No description provided"}
-          {initialData.description && (
-            <Preview
-              value={initialData.description}
-              
-            />
-          )}
-          </div>}
+        {!isEditing && (
+          <div
+            className={cn(
+              "text-sm mt-2",
+              !initialData.description && " text-slate-500 italic"
+            )}
+          >
+            {!initialData.description && "No description provided"}
+            {initialData.description && (
+              <Preview value={initialData.description} />
+            )}
+          </div>
+        )}
         {isEditing && (
           <>
             <div>
@@ -131,9 +137,7 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Editor
-                            {...field}
-                          />
+                          <Editor {...field} />
                         </FormControl>
                         <FormDescription>
                           What will you teach in this course?

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 datasource db {
@@ -20,23 +21,17 @@ model Course {
   description String?
   imageUrl    String?
   price       Float?
-
   isPublished Boolean      @default(false)
-
-
   categoryId  String?
-  Category    Category?    @relation(fields: [categoryId], references: [id])
-
-  chapters    Chapter[]
-
-  attachments Attachment[]
-
-  purchases   Purchase[]
-
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  attachments Attachment[]
+  chapters    Chapter[]
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  purchases   Purchase[]
 
   @@index([categoryId])
+  // @@fulltext([title])
 }
 
 model Category {
@@ -58,78 +53,63 @@ model Attachment {
 }
 
 model Chapter {
-  id        String   @id @default(uuid())
-  title     String
-  description String? @db.Text
-  videoUrl  String? @db.Text
-  position  Int
-
-  isPublished Boolean @default(false)
-  isFree    Boolean @default(false)
-
-  muxData MuxData?
-  
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
+  id           String         @id @default(uuid())
+  title        String
+  description  String?
+  videoUrl     String?
+  position     Int
+  isPublished  Boolean        @default(false)
+  isFree       Boolean        @default(false)
+  courseId     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  muxData      MuxData?
   userProgress UserProgress[]
-
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@index([courseId])
 }
 
 model MuxData {
-  id        String   @id @default(uuid())
+  id         String   @id @default(uuid())
   assetId    String
   playbackId String?
-
-  chapterId  String @unique
-  chapter    Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  chapterId  String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  chapter    Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 }
 
 model UserProgress {
-  id        String   @id @default(uuid())
-  isCompleted Boolean @default(false)
+  id          String   @id @default(uuid())
+  isCompleted Boolean  @default(false)
+  chapterId   String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  chapterId String
-  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  userId    String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  @@unique([userId, chapterId])
   @@index([chapterId])
-  @@unique([chapterId, userId])
 }
 
 model Purchase {
   id        String   @id @default(uuid())
   userId    String
-  
-  
   courseId  String
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+
+  @@unique([userId, courseId])
   @@index([courseId])
 }
 
 model StripeCustomer {
-  id        String   @id @default(uuid())
-  userId    String @unique
-
-  stripeCustomerId String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  stripeCustomerId String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
