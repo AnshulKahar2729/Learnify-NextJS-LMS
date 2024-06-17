@@ -15,6 +15,7 @@ export async function DELETE(
   try {
     const { userId } = auth();
     if (!userId) {
+      console.log("no login");
       return new NextResponse("Unauthorized, no login", { status: 401 });
     }
 

@@ -11,6 +11,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Chapter } from "@prisma/client";
@@ -60,10 +61,8 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
         description,
       };
 
-      await axios.patch(
-        `/api/courses/${courseId}/chapters/${chapterId}`,
-        payload
-      );
+      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, payload);
+
       return;
     },
     onSuccess: () => {
@@ -92,7 +91,7 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
     <>
       <div className=" mt-6 border bg-slate-100 rounded-md p-4">
         <div className=" font-medium flex items-center justify-between">
-          Course Description
+          Chapter Description
           <Button
             onClick={() => {
               setIsEditing((prev) => !prev);
@@ -119,7 +118,8 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
           >
             {!initialData.description && "No description provided"}
             {initialData.description && (
-              <Preview value={initialData.description} />
+              <>{initialData.description}</>
+              // <Preview value={initialData.description} />
             )}
           </div>
         )}
@@ -137,7 +137,11 @@ const ChapterDescriptionForm: FC<ChapterDescriptionFormProps> = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Editor {...field} />
+                          {/* <Editor {...field} /> */}
+                          <Textarea
+                            placeholder="e.g. 'This chapters is about ...'"
+                            {...field}
+                          />
                         </FormControl>
                         <FormDescription>
                           What will you teach in this course?

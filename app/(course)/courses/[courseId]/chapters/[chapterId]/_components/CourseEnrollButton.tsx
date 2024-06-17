@@ -12,7 +12,7 @@ const CourseEnrollButton : FC<CourseEnrollButtonProps> = ({price, courseId}) => 
   return (
     <Button
         size={"sm"}
-        className=' w-4 md:w-auto'
+        className=' w-full md:w-auto'
     >
       Enroll for {formatPrice(price)}
     </Button>

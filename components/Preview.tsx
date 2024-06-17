@@ -11,7 +11,7 @@ const Preview: FC<PreviewProps> = ({ value }) => {
     () => dynamic(() => import("react-quill"), { ssr: false }),
     []
   );
-  return <ReactQuill theme="snow" value={value} readOnly  />;
+  return <ReactQuill theme="snow" value={value} readOnly />;
 };
 
 export default Preview;
