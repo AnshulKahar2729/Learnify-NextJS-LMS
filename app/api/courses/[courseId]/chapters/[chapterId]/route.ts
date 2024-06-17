@@ -15,7 +15,7 @@ export async function DELETE(
   try {
     const { userId } = auth();
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized, no login", { status: 401 });
     }
 
     const courseId = params.courseId;
@@ -30,7 +30,7 @@ export async function DELETE(
 
     if (!courseOwner) {
       console.log("not a course owner");
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized, not a owner", { status: 401 });
     }
 
     const chapter = await db.chapter.findUnique({
@@ -84,9 +84,9 @@ export async function DELETE(
           isPublished: false,
         },
       });
-    };
+    }
 
-    return new NextResponse("Chapter is deleted", { status : 200  });
+    return new NextResponse("Chapter is deleted", { status: 200 });
   } catch (error) {
     console.log(error);
     return new NextResponse("An error occurred", { status: 500 });
