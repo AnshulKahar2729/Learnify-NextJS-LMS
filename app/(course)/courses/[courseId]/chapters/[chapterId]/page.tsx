@@ -71,14 +71,12 @@ const ChapterIdPage = async ({
           <div className=" p-4 flex flex-col md:flex-row items-center justify-between">
             <h2 className=" text-2xl font-semibold mb-2">{chapter.title}</h2>
             {purchase ? (
-             <CourseProgressButton
-              chapterId={params.chapterId}
-              courseId={params.courseId}
-              nextChapterId={nextChapter?.id}
-              isCompleted={!!userProgress?.isCompleted
-              }
-
-             />
+              <CourseProgressButton
+                chapterId={params.chapterId}
+                courseId={params.courseId}
+                nextChapterId={nextChapter?.id}
+                isCompleted={!!userProgress?.isCompleted}
+              />
             ) : (
               <>
                 <CourseEnrollButton
@@ -90,21 +88,36 @@ const ChapterIdPage = async ({
           </div>
           <Separator />
           <div className=" p-4">
-            {/* <Preview value={chapter.description!} /> */}
-            <span className=" font-bold">Course description</span> - {chapter.description!}
+            {/* {chapter.description && <Preview value={chapter.description!} />} */}
+            <span className=" font-bold">Course description</span> -{" "}
+            {chapter.description!}
           </div>
           {!!attachments.length && (
             <>
               <Separator />
               <div className=" p-4">
                 {attachments.map((attachment) => (
-                  <a href={attachment.url} target="_blank" key={attachment.id} className=" flex items-center p-3 w-full bg-sky-200 border border-sky-700 rounded-md hover:underline">
-                    <File className=""/>
+                  <a
+                    href={attachment.url}
+                    target="_blank"
+                    key={attachment.id}
+                    className=" flex items-center p-3 w-full bg-sky-200 border border-sky-700 rounded-md hover:underline"
+                  >
+                    <File className="" />
                     <p className=" line-clamp-1">{attachment.name}</p>
                   </a>
                 ))}
               </div>
             </>
+          )}
+          {isLocked && (
+            <div className=" p-4">
+              <p className=" flex items-center p-3 w-full bg-sky-200 border border-sky-700 rounded-md hover:underline ">
+                <File className="" />
+                This chapter is locked. You need to purchase this course to
+                access the attached files.
+              </p>
+            </div>
           )}
         </div>
       </div>

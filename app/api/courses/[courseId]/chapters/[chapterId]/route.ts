@@ -101,23 +101,25 @@ export async function PATCH(
   try {
     const { userId } = auth();
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized, not login", { status: 401 });
     }
 
-    const courseId = params.courseId;
-    const chapterId = params.chapterId;
+    const { courseId, chapterId } = params;
 
     const { isPublished, ...values } = await req.json();
+
+    console.log(userId, courseId, chapterId);
 
     const courseOwner = await db.course.findUnique({
       where: {
         id: courseId,
-        userId,
+        userId: userId,
       },
     });
 
     if (!courseOwner) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      console.log("not a course owner");
+      return new NextResponse("Unauthorized, not an owner", { status: 401 });
     }
 
     const chapter = await db.chapter.update({
