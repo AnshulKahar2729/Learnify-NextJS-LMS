@@ -1,12 +1,11 @@
 "use client";
 
 import { Search } from "lucide-react";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, Suspense, useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
-import { useRouter } from "next/router";
 
 interface SearchInputProps {}
 const SearchInput: FC<SearchInputProps> = ({}) => {
@@ -17,8 +16,7 @@ const SearchInput: FC<SearchInputProps> = ({}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // const currentCategoryId = searchParams.get("categoryId");
-  const {categoryId  : currentCategoryId} = router.query;
+  const currentCategoryId = searchParams.get("categoryId");
   useEffect(() => {
     const url = qs.stringifyUrl(
       {
@@ -45,4 +43,11 @@ const SearchInput: FC<SearchInputProps> = ({}) => {
   );
 };
 
-export default SearchInput;
+export function Searchbar() {
+  return (
+    // You could have a loading skeleton as the `fallback` too
+    <Suspense>
+      <SearchInput />
+    </Suspense>
+  );
+}
