@@ -1,9 +1,14 @@
 "use client";
 
+import { useConfettiStore } from "@/hooks/use-confetti-store";
 import { cn } from "@/lib/utils";
 import MuxPlayer from "@mux/mux-player-react";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 import { Loader2, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { FC } from "react";
+import toast from "react-hot-toast";
 
 interface VideoPlayerProps {
   chapterId: string;
@@ -23,7 +28,43 @@ const VideoPlayer: FC<VideoPlayerProps> = ({
   playbackId,
   title,
 }) => {
-    const [isReady, setIsReady] = React.useState(false);
+  const [isReady, setIsReady] = React.useState(false);
+  const router = useRouter();
+  const confetti = useConfettiStore();
+
+  const { mutate: markComplete } = useMutation({
+    mutationFn: async () => {
+      if (completeOnEnd) {
+        await axios.put(
+          `/api/courses/${courseId}/chapters/${chapterId}/progress`,
+          {
+            isCompleted: true,
+          }
+        );
+      }
+
+      return;
+    },
+    onSuccess: () => {
+      if (!nextChapterId) {
+        confetti.onOpen();
+      }
+
+      toast.success("Progress updated successfully.");
+      router.refresh();
+
+      if (nextChapterId) {
+        router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+      }
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          return router.push("/sign-in");
+        }
+      }
+    },
+  });
   return (
     <div className=" relative">
       {!isLocked && !isReady && (
@@ -37,18 +78,18 @@ const VideoPlayer: FC<VideoPlayerProps> = ({
           <p className=" text-sm">This chapter is locked.</p>
         </div>
       )}
-      {
-        !isLocked && (
-            <MuxPlayer
-                title={title}
-                className={cn(!isReady && "hidden")}
-                onCanPlay={() => setIsReady(true)}
-                onEnded={()=>{}}
-                autoPlay
-                playbackId={playbackId}
-            />
-        )
-      }
+      {!isLocked && (
+        <MuxPlayer
+          title={title}
+          className={cn(!isReady && "hidden")}
+          onCanPlay={() => setIsReady(true)}
+          onEnded={() => {
+            markComplete();
+          }}
+          autoPlay
+          playbackId={playbackId}
+        />
+      )}
     </div>
   );
 };
