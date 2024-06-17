@@ -4,19 +4,21 @@ import { Search } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import qs from "query-string";
+import { useRouter } from "next/router";
 
 interface SearchInputProps {}
 const SearchInput: FC<SearchInputProps> = ({}) => {
   const [value, setValue] = useState("");
   const debouncedValue = useDebounce(value);
 
-  const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const currentCategoryId = searchParams.get("categoryId");
+  // const currentCategoryId = searchParams.get("categoryId");
+  const {categoryId  : currentCategoryId} = router.query;
   useEffect(() => {
     const url = qs.stringifyUrl(
       {
