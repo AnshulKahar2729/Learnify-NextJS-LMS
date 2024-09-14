@@ -80,6 +80,9 @@ const ChapterIdPage = async ({
             ) : (
               <>
                 <CourseEnrollButton
+                  courseTitle={course.title}
+                  courseDescription={course.description || ""}
+                  courseImageUrl={course.imageUrl || ""}
                   courseId={params.courseId}
                   price={course.price!}
                 />
